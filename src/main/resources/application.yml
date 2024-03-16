@@ -16,7 +16,6 @@ spring:
         messageListener-out-0:
           binder: solace-broker
           destination: test-publisher-topic-1
-          group: QUE
         messagePublisher-out-0:
           binder: solace-broker
           destination: test-consumer-topic-1
@@ -48,7 +47,6 @@ spring:
             producer:
               queueNameExpression: '"test-publisher-topic-1"'
               provisionDurableQueue: false
-              provisionErrorQueue: false
               addDestinationAsSubscriptionToQueue: false
           messagePublisher-out-0:
             producer:

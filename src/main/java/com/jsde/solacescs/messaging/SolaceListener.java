@@ -8,7 +8,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import static java.lang.String.format;
 
@@ -18,10 +18,10 @@ public class SolaceListener {
   private static final Logger LOG = LoggerFactory.getLogger(SolaceListener.class);
 
   @Autowired
-  private AppEventPublisher appEventPublisher;
+  private StreamBridgePublisher streamBridgePublisher;
 
   @Bean
-  public Function<Message<String>, Message<String>> messageListener() {
+  public Consumer<Message<String>> messageListener() {
     return message -> {
       LOG.info("Listening to Solace test-consumer-queue-1");
       LOG.info(
@@ -30,12 +30,12 @@ public class SolaceListener {
       Message<String> processedMessage =
           MessageBuilder.withPayload("Message Processed by Listener")
               .copyHeaders(message.getHeaders()).build();
-      appEventPublisher.sendToExternalService("sending to 3rd party");
+      streamBridgePublisher.sendToExternalService("sending to 3rd party");
       LOG.info(
           format("Publishing message to test-publisher-topic-1 " +
                   "with Headers: %s and Payload: %s",
               processedMessage.getHeaders(), processedMessage.getPayload()));
-      return processedMessage;
+      streamBridgePublisher.sendToDownstreamService(processedMessage);
     };
   }
 
